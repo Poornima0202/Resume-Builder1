@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Registration Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0F172A;
+            --secondary: #1E293B;
+            --accent: #F59E0B;
+            --accent-2: #10B981;
+            --accent-3: #3B82F6;
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border: #334155;
+            --surface: #1E293B;
+            --surface-light: #334155;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.03;
+            animation: float 20s infinite;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-2);
+            bottom: -150px;
+            left: -150px;
+            animation-delay: 5s;
+        }
+
+        .bg-circle:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-3);
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, 50px) scale(1.1); }
+            50% { transform: translate(0, 100px) scale(0.9); }
+            75% { transform: translate(-50px, 50px) scale(1.05); }
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-pic {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary);
+            border: 2px solid var(--accent);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.875rem 1.25rem 0.875rem 3rem;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .nav-btn.active {
+            color: var(--accent);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        .logout-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            border: none;
+            color: var(--primary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .logout-btn:hover {
+            background: #F59E0B;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dashboard-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .dashboard-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            animation: slideUp 0.6s ease-out both;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .stat-icon.total { background: rgba(245, 158, 11, 0.15); color: var(--accent); }
+        .stat-icon.individual { background: rgba(59, 130, 246, 0.15); color: var(--accent-3); }
+        .stat-icon.agency { background: rgba(16, 185, 129, 0.15); color: var(--accent-2); }
+        .stat-icon.sub-agency { background: rgba(139, 92, 246, 0.15); color: #8B5CF6; }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        .stat-change.positive {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-2);
+        }
+
+        .stat-change.negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out 0.5s both;
+        }
+
+        .chart-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* User Table */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out 0.7s both;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.85rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table thead {
+            border-bottom: 2px solid var(--border);
+        }
+
+        .user-table th {
+            text-align: left;
+            padding: 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .user-table tbody tr:hover {
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.35rem 0.85rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-2);
+        }
+
+        .status-badge.inactive {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-muted);
+        }
+
+        .status-badge.suspended {
+            background: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+        }
+
+        /* Footer */
+        .footer {
+            position: relative;
+            z-index: 1;
+            background: var(--secondary);
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+
+            .search-bar {
+                order: 3;
+                flex: 1 1 100%;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-table {
+                font-size: 0.85rem;
+            }
+
+            .user-table th,
+            .user-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Decoration -->
+    <div class="bg-decoration">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="profile-pic" title="Admin User">AU</div>
+            </div>
+
+            <div class="search-bar">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Search users, cities, status..." id="searchInput">
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-btn active">Home</button>
+                <button class="nav-btn">Users</button>
+                <button class="nav-btn">Settings</button>
+                <button class="nav-btn">Profile</button>
+                <button class="logout-btn">Log Out</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Dashboard Overview</h1>
+            <p class="dashboard-subtitle">Monitor your registration metrics and user analytics</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Total Users</span>
+                    <div class="stat-icon total">👥</div>
+                </div>
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-change positive" id="totalChange">
+                    <span>↑</span> <span>12% from last week</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Individual</span>
+                    <div class="stat-icon individual">👤</div>
+                </div>
+                <div class="stat-value" id="individualCount">0</div>
+                <div class="stat-change positive">
+                    <span>↑</span> <span>8% from last week</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Agency</span>
+                    <div class="stat-icon agency">🏢</div>
+                </div>
+                <div class="stat-value" id="agencyCount">0</div>
+                <div class="stat-change positive">
+                    <span>↑</span> <span>15% from last week</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Sub Agency</span>
+                    <div class="stat-icon sub-agency">🏪</div>
+                </div>
+                <div class="stat-value" id="subAgencyCount">0</div>
+                <div class="stat-change positive">
+                    <span>↑</span> <span>10% from last week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Weekly User Growth</h3>
+                    <p class="chart-subtitle">Comparison of last week vs current week registrations</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Top Cities</h3>
+                    <p class="chart-subtitle">User distribution by location</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="cityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3 class="table-title">Recent Users</h3>
+                <button class="filter-btn">🔽 Filter</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>City</th>
+                            <th>Type</th>
+                            <th>Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">&copy; 2024 User Dashboard. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data - This would come from your registration form storage
+        const sampleUsers = [
+            { name: "John Doe", status: "Active", city: "Mumbai", type: "Individual", date: "2024-12-20" },
+            { name: "Jane Smith", status: "Active", city: "Bangalore", type: "Agency", date: "2024-12-21" },
+            { name: "Mike Johnson", status: "Inactive", city: "Delhi", type: "Sub Agency", date: "2024-12-19" },
+            { name: "Sarah Williams", status: "Active", city: "Chennai", type: "Individual", date: "2024-12-22" },
+            { name: "Tech Solutions", status: "Active", city: "Hyderabad", type: "Agency", date: "2024-12-23" },
+            { name: "Digital Hub", status: "Suspended", city: "Pune", type: "Sub Agency", date: "2024-12-18" },
+            { name: "Alex Brown", status: "Active", city: "Mumbai", type: "Individual", date: "2024-12-24" },
+            { name: "Creative Agency", status: "Active", city: "Bangalore", type: "Agency", date: "2024-12-25" },
+        ];
+
+        // Initialize Dashboard
+        function initDashboard() {
+            // Calculate statistics
+            const stats = calculateStats(sampleUsers);
+            updateStatCards(stats);
+            populateUserTable(sampleUsers);
+            createCharts(sampleUsers);
+            setupSearch();
+        }
+
+        function calculateStats(users) {
+            return {
+                total: users.length,
+                individual: users.filter(u => u.type === 'Individual').length,
+                agency: users.filter(u => u.type === 'Agency').length,
+                subAgency: users.filter(u => u.type === 'Sub Agency').length,
+            };
+        }
+
+        function updateStatCards(stats) {
+            document.getElementById('totalUsers').textContent = stats.total;
+            document.getElementById('individualCount').textContent = stats.individual;
+            document.getElementById('agencyCount').textContent = stats.agency;
+            document.getElementById('subAgencyCount').textContent = stats.subAgency;
+        }
+
+        function populateUserTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td><strong>${user.name}</strong></td>
+                    <td><span class="status-badge ${user.status.toLowerCase()}">${user.status}</span></td>
+                    <td>${user.city}</td>
+                    <td>${user.type}</td>
+                    <td>${formatDate(user.date)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function createCharts(users) {
+            // Weekly Growth Chart
+            const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+            new Chart(weeklyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        {
+                            label: 'Last Week',
+                            data: [5, 8, 6, 9, 7, 4, 3],
+                            backgroundColor: 'rgba(148, 163, 184, 0.5)',
+                            borderColor: 'rgba(148, 163, 184, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                        },
+                        {
+                            label: 'Current Week',
+                            data: [7, 10, 8, 12, 9, 6, 5],
+                            backgroundColor: 'rgba(245, 158, 11, 0.5)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#F8FAFC',
+                                font: { size: 12, weight: '600' }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                            ticks: { color: '#94A3B8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94A3B8' }
+                        }
+                    }
+                }
+            });
+
+            // City Distribution Chart
+            const cityData = {};
+            users.forEach(user => {
+                cityData[user.city] = (cityData[user.city] || 0) + 1;
+            });
+
+            const cityCtx = document.getElementById('cityChart').getContext('2d');
+            new Chart(cityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(cityData),
+                    datasets: [{
+                        data: Object.values(cityData),
+                        backgroundColor: [
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(236, 72, 153, 0.8)',
+                        ],
+                        borderColor: '#1E293B',
+                        borderWidth: 3,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#F8FAFC',
+                                padding: 15,
+                                font: { size: 11, weight: '600' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredUsers = sampleUsers.filter(user => 
+                    user.name.toLowerCase().includes(searchTerm) ||
+                    user.city.toLowerCase().includes(searchTerm) ||
+                    user.status.toLowerCase().includes(searchTerm) ||
+                    user.type.toLowerCase().includes(searchTerm)
+                );
+                populateUserTable(filteredUsers);
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
