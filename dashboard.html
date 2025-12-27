@@ -14,7 +14,7 @@
         }
 
         :root {
-            --primary: #0F172A;
+            --primary: #e0b6fb;
             --secondary: #1E293B;
             --accent: #F59E0B;
             --accent-2: #10B981;
@@ -601,6 +601,7 @@
             }
         }
     </style>
+    
 </head>
 <body>
     <!-- Background Decoration -->
@@ -626,10 +627,11 @@
             </div>
 
             <nav class="nav-menu">
-                <button class="nav-btn active">Home</button>
+                <button class="nav-btn active" id="homeBtn">Home</button>
                 <button class="nav-btn">Users</button>
                 <button class="nav-btn">Settings</button>
                 <button class="nav-btn">Profile</button>
+                <button class="nav-btn" id="registerBtn" onclick="openRegister()">Register here</button>
                 <button class="logout-btn">Log Out</button>
             </nav>
         </div>
@@ -915,7 +917,385 @@
         }
 
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initDashboard);
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            const home = document.getElementById('homeBtn');
+            if (home) home.addEventListener('click', restoreDashboard);
+        });
+
+        // Save original main content so we can restore later
+        const originalMainHTML = document.querySelector('.main-content').innerHTML;
+
+        function openRegister() {
+            const main = document.querySelector('.main-content');
+            // Insert registration template into main content (keeps header/footer)
+            const tmpl = document.getElementById('registrationTemplate');
+            if (!tmpl) {
+                // fallback to standalone page if template missing
+                window.location.href = 'Userform(2).html';
+                return;
+            }
+
+            // Save scroll pos
+            window._savedScroll = window.scrollY || 0;
+
+            main.innerHTML = tmpl.innerHTML;
+
+            // Execute the registration script stored as text (so it doesn't run until injected)
+            const scriptTextElem = document.getElementById('registrationScript');
+            if (scriptTextElem) {
+                const s = document.createElement('script');
+                s.textContent = scriptTextElem.textContent;
+                s.dataset.injected = 'true';
+                document.body.appendChild(s);
+            }
+
+            // mark active nav
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const regBtn = document.getElementById('registerBtn'); if (regBtn) regBtn.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function restoreDashboard() {
+            const main = document.querySelector('.main-content');
+            main.innerHTML = originalMainHTML;
+            // restore nav active state
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const home = document.getElementById('homeBtn'); if (home) home.classList.add('active');
+            // Remove any injected registration scripts
+            document.querySelectorAll('script[data-injected="true"]').forEach(s => s.remove());
+            // Reinitialize dashboard scripts
+            initDashboard();
+            window.scrollTo(0,0);
+        }
+
+        
     </script>
+
+    <!-- Registration template injected into .main-content when registering -->
+    <template id="registrationTemplate">
+        <style id="registrationStyles">
+            /* scoped registration styles (avoid global body rules) */
+            .registration-container .container{background:white;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.12);padding:32px;max-width:900px;margin:0 auto}
+            .registration-container h1{color:#333;margin-bottom:20px;text-align:center;font-size:24px}
+            .registration-container .form-group{margin-bottom:18px}
+            .registration-container label{display:block;margin-bottom:6px;color:#555;font-weight:600;font-size:13px}
+            .registration-container input[type="text"],
+            .registration-container input[type="date"],
+            .registration-container select{width:100%;padding:10px;border:1px solid #e6e6e6;border-radius:6px;font-size:14px}
+            .registration-container .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+            .registration-container .submit-btn{width:100%;padding:12px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer}
+            .registration-container .multi-select-wrapper{position:relative}
+            .registration-container .multi-select-display{width:100%;padding:10px;border:1px solid #e6e6e6;border-radius:6px;background:#fff;display:flex;justify-content:space-between;align-items:center;min-height:42px}
+            .registration-container .multi-select-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #cbd5e1;border-top:none;border-radius:0 0 6px 6px;max-height:220px;overflow:auto;z-index:1200;display:none}
+            .registration-container .multi-select-dropdown.show{display:block}
+            .registration-container .multi-select-option{padding:8px 12px;display:flex;gap:10px;align-items:center}
+            .registration-container .selected-tag{background:#667eea;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px}
+            .registration-container #registrationSummary{display:none}
+            .registration-container #registrationSummary.show{display:block}
+            .registration-container .summary-section{margin-bottom:16px;padding:14px;background:#f8f9fa;border-radius:8px}
+            @media(max-width:768px){.registration-container .row{grid-template-columns:1fr}}
+        </style>
+
+        <div class="registration-container">
+            <div class="container">
+                <!-- Registration Form (injected) -->
+                <div id="registrationForm">
+                    <h1>Registration Form</h1>
+                    <form id="mainForm">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                        </div>
+
+                        <h3 style="color:#667eea;margin-bottom:12px;font-size:16px">Contact Details</h3>
+
+                        <div class="form-group">
+                            <label for="address1">Address Line 1:</label>
+                            <input type="text" id="address1" name="address1" placeholder="Street address" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address2">Address Line 2:</label>
+                            <input type="text" id="address2" name="address2" placeholder="Apartment, suite, etc. (optional)">
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="city">City:</label>
+                                <select id="city" name="city" required>
+                                    <option value="">Select City</option>
+                                    <option value="Mumbai">Mumbai</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Bangalore">Bangalore</option>
+                                    <option value="Hyderabad">Hyderabad</option>
+                                    <option value="Chennai">Chennai</option>
+                                    <option value="Kolkata">Kolkata</option>
+                                    <option value="Pune">Pune</option>
+                                    <option value="Ahmedabad">Ahmedabad</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="state">State:</label>
+                                <select id="state" name="state" required>
+                                    <option value="">Select State</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                    <option value="West Bengal">West Bengal</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code:</label>
+                            <input type="text" id="postalCode" name="postalCode" placeholder="Enter postal code" pattern="[0-9]{6}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="dob">Date of Birth:</label>
+                                <input type="date" id="dob" name="dob" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Gender:</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="male" name="gender" value="Male" required>
+                                        <label for="male">Male</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="female" name="gender" value="Female" required>
+                                        <label for="female">Female</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="others" name="gender" value="Others" required>
+                                        <label for="others">Others</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Multi-select City -->
+                        <div class="form-group">
+                            <label>City (multi):</label>
+                            <div class="multi-select-wrapper">
+                                <div class="multi-select-display" onclick="toggleDropdown('cityMulti')">
+                                    <div class="multi-select-placeholder" id="cityMultiDisplay">Select cities</div>
+                                    <span class="multi-select-arrow" id="cityMultiArrow">▼</span>
+                                </div>
+                                <div class="multi-select-dropdown" id="cityMultiDropdown">
+                                    <div class="multi-select-option"><input type="checkbox" id="city_mumbai" value="Mumbai" onchange="updateMultiSelect('cityMulti')"><label for="city_mumbai">Mumbai</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="city_delhi" value="Delhi" onchange="updateMultiSelect('cityMulti')"><label for="city_delhi">Delhi</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="city_bangalore" value="Bangalore" onchange="updateMultiSelect('cityMulti')"><label for="city_bangalore">Bangalore</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="city_hyderabad" value="Hyderabad" onchange="updateMultiSelect('cityMulti')"><label for="city_hyderabad">Hyderabad</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="city_chennai" value="Chennai" onchange="updateMultiSelect('cityMulti')"><label for="city_chennai">Chennai</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="city_kolkata" value="Kolkata" onchange="updateMultiSelect('cityMulti')"><label for="city_kolkata">Kolkata</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="city_pune" value="Pune" onchange="updateMultiSelect('cityMulti')"><label for="city_pune">Pune</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="city_ahmedabad" value="Ahmedabad" onchange="updateMultiSelect('cityMulti')"><label for="city_ahmedabad">Ahmedabad</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Languages -->
+                        <div class="form-group">
+                            <label>Languages Known:</label>
+                            <div class="multi-select-wrapper">
+                                <div class="multi-select-display" onclick="toggleDropdown('languages')">
+                                    <div class="multi-select-placeholder" id="languagesDisplay">Select languages</div>
+                                    <span class="multi-select-arrow" id="languagesArrow">▼</span>
+                                </div>
+                                <div class="multi-select-dropdown" id="languagesDropdown">
+                                    <div class="multi-select-option"><input type="checkbox" id="lang_english" value="English" onchange="updateMultiSelect('languages')"><label for="lang_english">English</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="lang_hindi" value="Hindi" onchange="updateMultiSelect('languages')"><label for="lang_hindi">Hindi</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="lang_marathi" value="Marathi" onchange="updateMultiSelect('languages')"><label for="lang_marathi">Marathi</label></div>
+                                    <div class="multi-select-option"><input type="checkbox" id="lang_tamil" value="Tamil" onchange="updateMultiSelect('languages')"><label for="lang_tamil">Tamil</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="status">Status:</label>
+                                <select id="status" name="status" required>
+                                    <option value="">Select Status</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Suspended">Suspended</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="onboardingDate">Onboarding Date:</label>
+                                <input type="date" id="onboardingDate" name="onboardingDate" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type">Type:</label>
+                            <select id="type" name="type" required>
+                                <option value="">Select Type</option>
+                                <option value="Individual">Individual</option>
+                                <option value="Agency">Agency</option>
+                                <option value="Sub Agency">Sub Agency</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Submit Form</button>
+                    </form>
+                </div>
+
+                <div id="registrationSummary">
+                    <div class="summary-header">
+                        <h2>✓ Registration Successful</h2>
+                        <p>Your registration has been completed successfully</p>
+                    </div>
+                    <div class="summary-section">
+                        <h3>👤 Personal Information</h3>
+                        <div class="summary-item"><span class="summary-label">Name:</span><span class="summary-value" id="sum-name"></span></div>
+                        <div class="summary-item"><span class="summary-label">Date of Birth:</span><span class="summary-value" id="sum-dob"></span></div>
+                        <div class="summary-item"><span class="summary-label">Gender:</span><span class="summary-value" id="sum-gender"></span></div>
+                    </div>
+                    <div class="summary-section">
+                        <h3>📍 Contact Details</h3>
+                        <div class="summary-item"><span class="summary-label">Address Line 1:</span><span class="summary-value" id="sum-address1"></span></div>
+                        <div class="summary-item"><span class="summary-label">Address Line 2:</span><span class="summary-value" id="sum-address2"></span></div>
+                        <div class="summary-item"><span class="summary-label">City:</span><span class="summary-value" id="sum-city"></span></div>
+                        <div class="summary-item"><span class="summary-label">State:</span><span class="summary-value" id="sum-state"></span></div>
+                        <div class="summary-item"><span class="summary-label">Postal Code:</span><span class="summary-value" id="sum-postalCode"></span></div>
+                    </div>
+                    <div class="summary-section">
+                        <h3>🌐 Multi-select Information</h3>
+                        <div class="summary-item"><span class="summary-label">Selected Cities:</span><div class="summary-tags" id="sum-cityMulti"></div></div>
+                        <div class="summary-item"><span class="summary-label">Languages:</span><div class="summary-tags" id="sum-languages"></div></div>
+                    </div>
+
+                    <button class="back-btn" onclick="goBackToForm()" style="width:100%;padding:10px;margin-top:8px;border:1px solid #667eea;background:#fff;color:#667eea;border-radius:6px">Back to Form</button>
+                    <button class="submit-btn" onclick="downloadJSON()" style="margin-top:8px">Download JSON Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration script stored as text; the injector will create a real script element and run it -->
+        <script id="registrationScript" type="text/plain">
+        // Store current registration data
+        let currentRegistrationData = null;
+
+        // City to Area mapping (minimal set used by injected UI)
+        const cityAreaMap = {
+            'Mumbai': ['Andheri','Bandra','Borivali','Colaba','Dadar','Juhu','Kurla','Malad','Powai','Thane'],
+            'Delhi': ['Connaught Place','Dwarka','Karol Bagh','Lajpat Nagar','Nehru Place','Rohini','Saket','Vasant Kunj'],
+            'Bangalore': ['Indiranagar','Jayanagar','Koramangala','Marathahalli','MG Road','Rajajinagar','RT Nagar','Whitefield','Yelahanka'],
+            'Hyderabad': ['Banjara Hills','Gachibowli','Hitech City','Jubilee Hills','Kukatpally','Madhapur','Secunderabad'],
+            'Chennai': ['Adyar','Anna Nagar','Guindy','Mylapore','Nungambakkam','T Nagar','Velachery'],
+            'Kolkata': ['Alipore','Ballygunge','Howrah','Park Street','Salt Lake','Tollygunge'],
+            'Pune': ['Aundh','Baner','Hinjewadi','Kothrud','Koregaon Park','Pimpri','Viman Nagar','Wakad'],
+            'Ahmedabad': ['Bopal','Maninagar','Naranpura','Satellite','SG Highway','Vastrapur']
+        };
+
+        const multiSelectData = { cityMulti: [], languages: [] };
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id + 'Dropdown');
+            const arrow = document.getElementById(id + 'Arrow');
+            const display = dropdown ? dropdown.previousElementSibling : null;
+            if (!dropdown) return;
+            document.querySelectorAll('.multi-select-dropdown').forEach(dd => { if (dd.id !== id + 'Dropdown') dd.classList.remove('show'); });
+            document.querySelectorAll('.multi-select-arrow').forEach(arr => { if (arr.id !== id + 'Arrow') arr.classList.remove('open'); });
+            document.querySelectorAll('.multi-select-display').forEach(disp => { if (disp.nextElementSibling && disp.nextElementSibling.id !== id + 'Dropdown') disp.classList.remove('active'); });
+            dropdown.classList.toggle('show');
+            if (arrow) arrow.classList.toggle('open');
+            if (display) display.classList.toggle('active');
+        }
+
+        function updateMultiSelect(id) {
+            const dropdown = document.getElementById(id + 'Dropdown');
+            if (!dropdown) return;
+            const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+            const values = Array.from(checkboxes).map(cb => cb.value);
+            multiSelectData[id] = values;
+            const displayElement = document.getElementById(id + 'Display');
+            if (!displayElement) return;
+            if (values.length === 0) {
+                displayElement.className = 'multi-select-placeholder';
+                let placeholderText = 'Select items';
+                if (id === 'cityMulti') placeholderText = 'Select cities';
+                else if (id === 'languages') placeholderText = 'Select languages';
+                displayElement.innerHTML = placeholderText;
+            } else {
+                displayElement.className = 'multi-select-selected';
+                displayElement.innerHTML = values.map(val => `<span class="selected-tag">${val}</span>`).join('');
+            }
+        }
+
+        function updateAreaDropdowns(city) {
+            const areaMultiDropdown = document.getElementById('areaMultiDropdown');
+            const areaMultiDisplay = document.getElementById('areaMultiDisplay');
+            if (!areaMultiDropdown) return;
+            if (!city || !cityAreaMap[city]) {
+                areaMultiDropdown.innerHTML = '<div class="multi-select-option" style="padding: 12px; text-align: center; color: #999;">Please select a city to see available areas</div>';
+                if (areaMultiDisplay) { areaMultiDisplay.className = 'multi-select-placeholder'; areaMultiDisplay.innerHTML = 'Select a city first'; }
+                return;
+            }
+            const areas = cityAreaMap[city];
+            areaMultiDropdown.innerHTML = '';
+            areas.forEach(area => {
+                const div = document.createElement('div'); div.className = 'multi-select-option';
+                const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = `area_${area.toLowerCase().replace(/\s+/g,'_')}`; cb.value = area; cb.onchange = () => updateMultiSelect('areaMulti');
+                const lbl = document.createElement('label'); lbl.htmlFor = cb.id; lbl.textContent = area;
+                div.appendChild(cb); div.appendChild(lbl); areaMultiDropdown.appendChild(div);
+            });
+            if (areaMultiDisplay) { areaMultiDisplay.className = 'multi-select-placeholder'; areaMultiDisplay.innerHTML = 'Select areas'; }
+        }
+
+        // Click outside to close dropdowns
+        document.addEventListener('click', function(e){ if (!e.target.closest('.multi-select-wrapper')) { document.querySelectorAll('.multi-select-dropdown').forEach(dd=>dd.classList.remove('show')); document.querySelectorAll('.multi-select-arrow').forEach(a=>a.classList.remove('open')); document.querySelectorAll('.multi-select-display').forEach(d=>d.classList.remove('active')); } });
+
+        // Form submission handler (attach after injection)
+        function attachFormHandler() {
+            const form = document.getElementById('mainForm');
+            if (!form) return;
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+                // simple multi-select validation
+                if ((multiSelectData.cityMulti && multiSelectData.cityMulti.length===0)) { alert('Please select at least one city'); return; }
+                // gather form data
+                const fd = new FormData(form); const data = {};
+                for (let [k,v] of fd.entries()) data[k]=v;
+                data.cityMulti = multiSelectData.cityMulti || [];
+                data.languages = multiSelectData.languages || [];
+                data.submittedAt = new Date().toISOString();
+                saveToJSON(data); displaySummary(data);
+            });
+        }
+
+        function saveToJSON(data){ currentRegistrationData = data; const jsonString = JSON.stringify(data,null,2); const blob = new Blob([jsonString],{type:'application/json'}); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href=url; link.download = `registration_${(data.name||'user').replace(/\s+/g,'_')}_${Date.now()}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); }
+
+        function downloadJSON(){ if(!currentRegistrationData){ alert('No registration data available'); return; } const jsonString = JSON.stringify(currentRegistrationData,null,2); const blob = new Blob([jsonString],{type:'application/json'}); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href=url; link.download = `registration_${(currentRegistrationData.name||'user').replace(/\s+/g,'_')}_${Date.now()}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); }
+
+        function displaySummary(data){ const formEl = document.getElementById('registrationForm'); const sumEl = document.getElementById('registrationSummary'); if (formEl) formEl.style.display='none'; if (sumEl) sumEl.classList.add('show'); const set = (id,val)=>{ const el = document.getElementById(id); if(el) el.textContent = val || 'N/A'; } set('sum-name',data.name); set('sum-dob',data.dob); set('sum-gender',data.gender); set('sum-address1',data.address1); set('sum-address2',data.address2||'N/A'); set('sum-city',data.city); set('sum-state',data.state); set('sum-postalCode',data.postalCode); set('sum-status',data.status); set('sum-onboardingDate',data.onboardingDate); set('sum-type',data.type);
+            const mapToTags=(arr,id)=>{ const holder = document.getElementById(id); if(!holder) return; holder.innerHTML = (arr||[]).map(v=>`<span class="summary-tag">${v}</span>`).join(''); };
+            mapToTags(data.cityMulti,'sum-cityMulti'); mapToTags(data.languages,'sum-languages'); window.scrollTo(0,0);
+        }
+
+        function goBackToForm(){ const formEl = document.getElementById('registrationForm'); const sumEl = document.getElementById('registrationSummary'); if(formEl) formEl.style.display='block'; if(sumEl) sumEl.classList.remove('show'); window.scrollTo(0,0); }
+
+        // Run small initializer after script is injected
+        (function(){
+            // wire city change to update area dropdown if area dropdown exists
+            const citySelect = document.getElementById('city'); if(citySelect){ citySelect.addEventListener('change', function(){ updateAreaDropdowns(this.value); }); }
+            // attach form handler
+            attachFormHandler();
+        })();
+
+        </script>
+    </template>
 </body>
 </html>
+
