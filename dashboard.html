@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - Registration Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <title>Dashboard - Resume Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,238 +12,82 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #e0b6fb;
-            --secondary: #1E293B;
-            --accent: #F59E0B;
-            --accent-2: #10B981;
-            --accent-3: #3B82F6;
-            --text: #F8FAFC;
-            --text-muted: #94A3B8;
-            --border: #334155;
-            --surface: #1E293B;
-            --surface-light: #334155;
-        }
-
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--primary);
-            color: var(--text);
-            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
         }
 
-        /* Animated Background */
-        .bg-decoration {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .bg-circle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.03;
-            animation: float 20s infinite;
-        }
-
-        .bg-circle:nth-child(1) {
-            width: 500px;
-            height: 500px;
-            background: var(--accent);
-            top: -200px;
-            right: -200px;
-            animation-delay: 0s;
-        }
-
-        .bg-circle:nth-child(2) {
-            width: 400px;
-            height: 400px;
-            background: var(--accent-2);
-            bottom: -150px;
-            left: -150px;
-            animation-delay: 5s;
-        }
-
-        .bg-circle:nth-child(3) {
-            width: 300px;
-            height: 300px;
-            background: var(--accent-3);
-            top: 50%;
-            left: 50%;
-            animation-delay: 10s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(50px, 50px) scale(1.1); }
-            50% { transform: translate(0, 100px) scale(0.9); }
-            75% { transform: translate(-50px, 50px) scale(1.05); }
-        }
-
-        /* Header */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 1.5rem 2rem;
-            animation: slideDown 0.5s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 2rem;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .logo-section {
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+
+        .navbar-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 20px;
         }
 
-        .profile-pic {
-            width: 48px;
-            height: 48px;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--primary);
-            border: 2px solid var(--accent);
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .profile-pic:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .search-bar {
-            flex: 1;
-            max-width: 500px;
-            position: relative;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 0.875rem 1.25rem 0.875rem 3rem;
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-bar input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-btn {
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-btn:hover {
-            color: var(--text);
-            background: var(--surface);
-        }
-
-        .nav-btn.active {
-            color: var(--accent);
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .nav-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 2px;
-            background: var(--accent);
+            font-weight: 600;
+            font-size: 1.1rem;
         }
 
         .logout-btn {
-            padding: 0.75rem 1.5rem;
-            background: var(--accent);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
             border: none;
-            color: var(--primary);
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
+            padding: 8px 20px;
             border-radius: 8px;
-            transition: all 0.3s ease;
-            margin-left: 1rem;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
         .logout-btn:hover {
-            background: #F59E0B;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Main Content */
-        .main-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2.5rem 2rem;
-            animation: fadeIn 0.8s ease-out 0.3s both;
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
-        @keyframes fadeIn {
+        .welcome-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -255,1047 +98,219 @@
             }
         }
 
-        .dashboard-header {
-            margin-bottom: 2.5rem;
+        .welcome-section h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 10px;
         }
 
-        .dashboard-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--text), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .welcome-section p {
+            color: #666;
+            font-size: 1rem;
         }
 
-        .dashboard-subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-
-        /* Stats Cards */
-        .stats-grid {
+        .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        
         }
 
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.75rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            animation: slideUp 0.6s ease-out both;
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            animation: slideUp 0.6s ease;
         }
 
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent), var(--accent-2));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.5s ease;
-        }
-
-        .stat-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .stat-card:hover {
+        .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
         }
 
-        .stat-icon.total { background: rgba(245, 158, 11, 0.15); color: var(--accent); }
-        .stat-icon.individual { background: rgba(59, 130, 246, 0.15); color: var(--accent-3); }
-        .stat-icon.agency { background: rgba(16, 185, 129, 0.15); color: var(--accent-2); }
-        .stat-icon.sub-agency { background: rgba(139, 92, 246, 0.15); color: #8B5CF6; }
-
-        .stat-value {
-            font-family: 'Syne', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--text);
-            line-height: 1;
-            margin-bottom: 0.5rem;
+        .card h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
         }
 
-        .stat-change {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.85rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 6px;
-        }
-
-        .stat-change.positive {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-2);
-        }
-
-        .stat-change.negative {
-            background: rgba(239, 68, 68, 0.15);
-            color: #EF4444;
-        }
-
-        /* Charts Section */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .chart-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            animation: fadeIn 0.8s ease-out 0.5s both;
-        }
-
-        .chart-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .chart-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .chart-subtitle {
-            color: var(--text-muted);
+        .card p {
+            color: #666;
             font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
         }
 
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-
-        /* User Table */
-        .table-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            animation: fadeIn 0.8s ease-out 0.7s both;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .table-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            background: var(--surface-light);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 0.85rem;
-            border-radius: 8px;
+        .card-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn:hover {
-            border-color: var(--accent);
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .user-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .user-table thead {
-            border-bottom: 2px solid var(--border);
-        }
-
-        .user-table th {
-            text-align: left;
-            padding: 1rem;
-            color: var(--text-muted);
+            font-family: 'Poppins', sans-serif;
             font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 200px;
+            height: 200px;
+            padding: 0;
         }
 
-        .user-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
+
+        .card-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .user-table tbody tr {
-            transition: all 0.2s ease;
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.7s ease;
         }
 
-        .user-table tbody tr:hover {
-            background: rgba(245, 158, 11, 0.05);
+        .stats-section h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 0.35rem 0.85rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
-        .status-badge.active {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-2);
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
         }
 
-        .status-badge.inactive {
-            background: rgba(148, 163, 184, 0.15);
-            color: var(--text-muted);
+        .stat-box h4 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
         }
 
-        .status-badge.suspended {
-            background: rgba(239, 68, 68, 0.15);
-            color: #EF4444;
-        }
-
-        /* Footer */
-        .footer {
-            position: relative;
-            z-index: 1;
-            background: var(--secondary);
-            border-top: 1px solid var(--border);
-            padding: 2rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .footer-text {
-            color: var(--text-muted);
+        .stat-box p {
             font-size: 0.9rem;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .footer-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-link:hover {
-            color: var(--accent);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
+            opacity: 0.9;
         }
 
         @media (max-width: 768px) {
-            .header-content {
-                flex-wrap: wrap;
+            .navbar {
+                padding: 15px 20px;
             }
 
-            .search-bar {
-                order: 3;
-                flex: 1 1 100%;
+            .navbar h1 {
+                font-size: 1.2rem;
             }
 
-            .nav-menu {
-                flex-wrap: wrap;
+            .welcome-section {
+                padding: 30px 20px;
             }
 
-            .dashboard-title {
-                font-size: 2rem;
+            .welcome-section h2 {
+                font-size: 1.5rem;
             }
 
-            .stats-grid {
+            .cards-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .user-table {
-                font-size: 0.85rem;
-            }
-
-            .user-table th,
-            .user-table td {
-                padding: 0.75rem 0.5rem;
             }
         }
     </style>
-    
 </head>
 <body>
-    <!-- Background Decoration -->
-    <div class="bg-decoration">
-        <div class="bg-circle"></div>
-        <div class="bg-circle"></div>
-        <div class="bg-circle"></div>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>Dashboard</h1>
+        <div class="navbar-right">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <span id="userName">User</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h2 id="welcomeMessage">Welcome back, User!</h2>
+        </div>
+
+        <!-- Action Cards -->
+        <div class="cards-grid">
+            <button class="card-btn" onclick="goToResumeBuilder()">Resume Builder</button>
+        </div>
     </div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo-section">
-                <div class="profile-pic" title="Admin User">AU</div>
-            </div>
-
-            <div class="search-bar">
-                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                <input type="text" placeholder="Search users, cities, status..." id="searchInput">
-            </div>
-
-            <nav class="nav-menu">
-                <button class="nav-btn active" id="homeBtn">Home</button>
-                <button class="nav-btn">Users</button>
-                <button class="nav-btn">Settings</button>
-                <button class="nav-btn">Profile</button>
-                <button class="nav-btn" id="registerBtn" onclick="openRegister()">Register here</button>
-                <button class="logout-btn">Log Out</button>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <h1 class="dashboard-title">Dashboard Overview</h1>
-            <p class="dashboard-subtitle">Monitor your registration metrics and user analytics</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Total Users</span>
-                    <div class="stat-icon total">👥</div>
-                </div>
-                <div class="stat-value" id="totalUsers">0</div>
-                <div class="stat-change positive" id="totalChange">
-                    <span>↑</span> <span>12% from last week</span>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Individual</span>
-                    <div class="stat-icon individual">👤</div>
-                </div>
-                <div class="stat-value" id="individualCount">0</div>
-                <div class="stat-change positive">
-                    <span>↑</span> <span>8% from last week</span>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Agency</span>
-                    <div class="stat-icon agency">🏢</div>
-                </div>
-                <div class="stat-value" id="agencyCount">0</div>
-                <div class="stat-change positive">
-                    <span>↑</span> <span>15% from last week</span>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Sub Agency</span>
-                    <div class="stat-icon sub-agency">🏪</div>
-                </div>
-                <div class="stat-value" id="subAgencyCount">0</div>
-                <div class="stat-change positive">
-                    <span>↑</span> <span>10% from last week</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">Weekly User Growth</h3>
-                    <p class="chart-subtitle">Comparison of last week vs current week registrations</p>
-                </div>
-                <div class="chart-container">
-                    <canvas id="weeklyChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">Top Cities</h3>
-                    <p class="chart-subtitle">User distribution by location</p>
-                </div>
-                <div class="chart-container">
-                    <canvas id="cityChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Table -->
-        <div class="table-card">
-            <div class="table-header">
-                <h3 class="table-title">Recent Users</h3>
-                <button class="filter-btn">🔽 Filter</button>
-            </div>
-
-            <div style="overflow-x: auto;">
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>City</th>
-                            <th>Type</th>
-                            <th>Registered</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p class="footer-text">&copy; 2024 User Dashboard. All rights reserved.</p>
-            <div class="footer-links">
-                <a href="#" class="footer-link">Privacy Policy</a>
-                <a href="#" class="footer-link">Terms of Service</a>
-                <a href="#" class="footer-link">Contact Support</a>
-            </div>
-        </div>
-    </footer>
-
     <script>
-        // Sample data - This would come from your registration form storage
-        const sampleUsers = [
-            { name: "John Doe", status: "Active", city: "Mumbai", type: "Individual", date: "2024-12-20" },
-            { name: "Jane Smith", status: "Active", city: "Bangalore", type: "Agency", date: "2024-12-21" },
-            { name: "Mike Johnson", status: "Inactive", city: "Delhi", type: "Sub Agency", date: "2024-12-19" },
-            { name: "Sarah Williams", status: "Active", city: "Chennai", type: "Individual", date: "2024-12-22" },
-            { name: "Tech Solutions", status: "Active", city: "Hyderabad", type: "Agency", date: "2024-12-23" },
-            { name: "Digital Hub", status: "Suspended", city: "Pune", type: "Sub Agency", date: "2024-12-18" },
-            { name: "Alex Brown", status: "Active", city: "Mumbai", type: "Individual", date: "2024-12-24" },
-            { name: "Creative Agency", status: "Active", city: "Bangalore", type: "Agency", date: "2024-12-25" },
-        ];
+        const API_BASE_URL = 'http://localhost:5000/api';
 
-        // Initialize Dashboard
-        function initDashboard() {
-            // Calculate statistics
-            const stats = calculateStats(sampleUsers);
-            updateStatCards(stats);
-            populateUserTable(sampleUsers);
-            createCharts(sampleUsers);
-            setupSearch();
+        // Check if user is logged in
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const user = localStorage.getItem('user');
+
+            if (!isLoggedIn || !user) {
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            return JSON.parse(user);
         }
 
-        function calculateStats(users) {
-            return {
-                total: users.length,
-                individual: users.filter(u => u.type === 'Individual').length,
-                agency: users.filter(u => u.type === 'Agency').length,
-                subAgency: users.filter(u => u.type === 'Sub Agency').length,
-            };
+        // Load user information
+        function loadUserInfo() {
+            const user = checkAuth();
+            if (!user) return;
+
+            // Set user name
+            document.getElementById('userName').textContent = user.username;
+            document.getElementById('welcomeMessage').textContent = 
+                `Welcome back, ${user.firstName} ${user.lastName}!`;
+
+            // Set user avatar (first letter of first name)
+            document.getElementById('userAvatar').textContent = 
+                user.firstName.charAt(0).toUpperCase();
+        }
+        // Navigation functions
+        function goToResumeBuilder() {
+            window.location.href = 'ResumeDashboard.html';
+        }
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'login.html';
+            }
         }
 
-        function updateStatCards(stats) {
-            document.getElementById('totalUsers').textContent = stats.total;
-            document.getElementById('individualCount').textContent = stats.individual;
-            document.getElementById('agencyCount').textContent = stats.agency;
-            document.getElementById('subAgencyCount').textContent = stats.subAgency;
-        }
-
-        function populateUserTable(users) {
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = users.map(user => `
-                <tr>
-                    <td><strong>${user.name}</strong></td>
-                    <td><span class="status-badge ${user.status.toLowerCase()}">${user.status}</span></td>
-                    <td>${user.city}</td>
-                    <td>${user.type}</td>
-                    <td>${formatDate(user.date)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        function createCharts(users) {
-            // Weekly Growth Chart
-            const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
-            new Chart(weeklyCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [
-                        {
-                            label: 'Last Week',
-                            data: [5, 8, 6, 9, 7, 4, 3],
-                            backgroundColor: 'rgba(148, 163, 184, 0.5)',
-                            borderColor: 'rgba(148, 163, 184, 1)',
-                            borderWidth: 2,
-                            borderRadius: 8,
-                        },
-                        {
-                            label: 'Current Week',
-                            data: [7, 10, 8, 12, 9, 6, 5],
-                            backgroundColor: 'rgba(245, 158, 11, 0.5)',
-                            borderColor: 'rgba(245, 158, 11, 1)',
-                            borderWidth: 2,
-                            borderRadius: 8,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#F8FAFC',
-                                font: { size: 12, weight: '600' }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(51, 65, 85, 0.5)' },
-                            ticks: { color: '#94A3B8' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94A3B8' }
-                        }
-                    }
-                }
-            });
-
-            // City Distribution Chart
-            const cityData = {};
-            users.forEach(user => {
-                cityData[user.city] = (cityData[user.city] || 0) + 1;
-            });
-
-            const cityCtx = document.getElementById('cityChart').getContext('2d');
-            new Chart(cityCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(cityData),
-                    datasets: [{
-                        data: Object.values(cityData),
-                        backgroundColor: [
-                            'rgba(245, 158, 11, 0.8)',
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(236, 72, 153, 0.8)',
-                        ],
-                        borderColor: '#1E293B',
-                        borderWidth: 3,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#F8FAFC',
-                                padding: 15,
-                                font: { size: 11, weight: '600' }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function setupSearch() {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const filteredUsers = sampleUsers.filter(user => 
-                    user.name.toLowerCase().includes(searchTerm) ||
-                    user.city.toLowerCase().includes(searchTerm) ||
-                    user.status.toLowerCase().includes(searchTerm) ||
-                    user.type.toLowerCase().includes(searchTerm)
-                );
-                populateUserTable(filteredUsers);
-            });
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            initDashboard();
-            const home = document.getElementById('homeBtn');
-            if (home) home.addEventListener('click', restoreDashboard);
+        // Load everything on page load
+        window.addEventListener('load', () => {
+            loadUserInfo();
         });
-
-        // Save original main content so we can restore later
-        const originalMainHTML = document.querySelector('.main-content').innerHTML;
-
-        function openRegister() {
-            const main = document.querySelector('.main-content');
-            // Insert registration template into main content (keeps header/footer)
-            const tmpl = document.getElementById('registrationTemplate');
-            if (!tmpl) {
-                // fallback to standalone page if template missing
-                window.location.href = 'Userform(2).html';
-                return;
-            }
-
-            // Save scroll pos
-            window._savedScroll = window.scrollY || 0;
-
-            main.innerHTML = tmpl.innerHTML;
-
-            // Execute the registration script stored as text (so it doesn't run until injected)
-            const scriptTextElem = document.getElementById('registrationScript');
-            if (scriptTextElem) {
-                const s = document.createElement('script');
-                s.textContent = scriptTextElem.textContent;
-                s.dataset.injected = 'true';
-                document.body.appendChild(s);
-            }
-
-            // mark active nav
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const regBtn = document.getElementById('registerBtn'); if (regBtn) regBtn.classList.add('active');
-            window.scrollTo(0,0);
-        }
-
-        function restoreDashboard() {
-            const main = document.querySelector('.main-content');
-            main.innerHTML = originalMainHTML;
-            // restore nav active state
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const home = document.getElementById('homeBtn'); if (home) home.classList.add('active');
-            // Remove any injected registration scripts
-            document.querySelectorAll('script[data-injected="true"]').forEach(s => s.remove());
-            // Reinitialize dashboard scripts
-            initDashboard();
-            window.scrollTo(0,0);
-        }
-
-        
     </script>
-
-    <!-- Registration template injected into .main-content when registering -->
-    <template id="registrationTemplate">
-        <style id="registrationStyles">
-            /* scoped registration styles (avoid global body rules) */
-            .registration-container .container{background:white;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.12);padding:32px;max-width:900px;margin:0 auto}
-            .registration-container h1{color:#333;margin-bottom:20px;text-align:center;font-size:24px}
-            .registration-container .form-group{margin-bottom:18px}
-            .registration-container label{display:block;margin-bottom:6px;color:#555;font-weight:600;font-size:13px}
-            .registration-container input[type="text"],
-            .registration-container input[type="date"],
-            .registration-container select{width:100%;padding:10px;border:1px solid #e6e6e6;border-radius:6px;font-size:14px}
-            .registration-container .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-            .registration-container .submit-btn{width:100%;padding:12px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer}
-            .registration-container .multi-select-wrapper{position:relative}
-            .registration-container .multi-select-display{width:100%;padding:10px;border:1px solid #e6e6e6;border-radius:6px;background:#fff;display:flex;justify-content:space-between;align-items:center;min-height:42px}
-            .registration-container .multi-select-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #cbd5e1;border-top:none;border-radius:0 0 6px 6px;max-height:220px;overflow:auto;z-index:1200;display:none}
-            .registration-container .multi-select-dropdown.show{display:block}
-            .registration-container .multi-select-option{padding:8px 12px;display:flex;gap:10px;align-items:center}
-            .registration-container .selected-tag{background:#667eea;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px}
-            .registration-container #registrationSummary{display:none}
-            .registration-container #registrationSummary.show{display:block}
-            .registration-container .summary-section{margin-bottom:16px;padding:14px;background:#f8f9fa;border-radius:8px}
-            @media(max-width:768px){.registration-container .row{grid-template-columns:1fr}}
-        </style>
-
-        <div class="registration-container">
-            <div class="container">
-                <!-- Registration Form (injected) -->
-                <div id="registrationForm">
-                    <h1>Registration Form</h1>
-                    <form id="mainForm">
-                        <div class="form-group">
-                            <label for="name">Name:</label>
-                            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-                        </div>
-
-                        <h3 style="color:#667eea;margin-bottom:12px;font-size:16px">Contact Details</h3>
-
-                        <div class="form-group">
-                            <label for="address1">Address Line 1:</label>
-                            <input type="text" id="address1" name="address1" placeholder="Street address" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="address2">Address Line 2:</label>
-                            <input type="text" id="address2" name="address2" placeholder="Apartment, suite, etc. (optional)">
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                <label for="city">City:</label>
-                                <select id="city" name="city" required>
-                                    <option value="">Select City</option>
-                                    <option value="Mumbai">Mumbai</option>
-                                    <option value="Delhi">Delhi</option>
-                                    <option value="Bangalore">Bangalore</option>
-                                    <option value="Hyderabad">Hyderabad</option>
-                                    <option value="Chennai">Chennai</option>
-                                    <option value="Kolkata">Kolkata</option>
-                                    <option value="Pune">Pune</option>
-                                    <option value="Ahmedabad">Ahmedabad</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="state">State:</label>
-                                <select id="state" name="state" required>
-                                    <option value="">Select State</option>
-                                    <option value="Maharashtra">Maharashtra</option>
-                                    <option value="Delhi">Delhi</option>
-                                    <option value="Karnataka">Karnataka</option>
-                                    <option value="Telangana">Telangana</option>
-                                    <option value="Tamil Nadu">Tamil Nadu</option>
-                                    <option value="West Bengal">West Bengal</option>
-                                    <option value="Gujarat">Gujarat</option>
-                                    <option value="Rajasthan">Rajasthan</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="postalCode">Postal Code:</label>
-                            <input type="text" id="postalCode" name="postalCode" placeholder="Enter postal code" pattern="[0-9]{6}" required>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                <label for="dob">Date of Birth:</label>
-                                <input type="date" id="dob" name="dob" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Gender:</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="male" name="gender" value="Male" required>
-                                        <label for="male">Male</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="female" name="gender" value="Female" required>
-                                        <label for="female">Female</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="others" name="gender" value="Others" required>
-                                        <label for="others">Others</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Multi-select City -->
-                        <div class="form-group">
-                            <label>City (multi):</label>
-                            <div class="multi-select-wrapper">
-                                <div class="multi-select-display" onclick="toggleDropdown('cityMulti')">
-                                    <div class="multi-select-placeholder" id="cityMultiDisplay">Select cities</div>
-                                    <span class="multi-select-arrow" id="cityMultiArrow">▼</span>
-                                </div>
-                                <div class="multi-select-dropdown" id="cityMultiDropdown">
-                                    <div class="multi-select-option"><input type="checkbox" id="city_mumbai" value="Mumbai" onchange="updateMultiSelect('cityMulti')"><label for="city_mumbai">Mumbai</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="city_delhi" value="Delhi" onchange="updateMultiSelect('cityMulti')"><label for="city_delhi">Delhi</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="city_bangalore" value="Bangalore" onchange="updateMultiSelect('cityMulti')"><label for="city_bangalore">Bangalore</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="city_hyderabad" value="Hyderabad" onchange="updateMultiSelect('cityMulti')"><label for="city_hyderabad">Hyderabad</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="city_chennai" value="Chennai" onchange="updateMultiSelect('cityMulti')"><label for="city_chennai">Chennai</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="city_kolkata" value="Kolkata" onchange="updateMultiSelect('cityMulti')"><label for="city_kolkata">Kolkata</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="city_pune" value="Pune" onchange="updateMultiSelect('cityMulti')"><label for="city_pune">Pune</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="city_ahmedabad" value="Ahmedabad" onchange="updateMultiSelect('cityMulti')"><label for="city_ahmedabad">Ahmedabad</label></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Languages -->
-                        <div class="form-group">
-                            <label>Languages Known:</label>
-                            <div class="multi-select-wrapper">
-                                <div class="multi-select-display" onclick="toggleDropdown('languages')">
-                                    <div class="multi-select-placeholder" id="languagesDisplay">Select languages</div>
-                                    <span class="multi-select-arrow" id="languagesArrow">▼</span>
-                                </div>
-                                <div class="multi-select-dropdown" id="languagesDropdown">
-                                    <div class="multi-select-option"><input type="checkbox" id="lang_english" value="English" onchange="updateMultiSelect('languages')"><label for="lang_english">English</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="lang_hindi" value="Hindi" onchange="updateMultiSelect('languages')"><label for="lang_hindi">Hindi</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="lang_marathi" value="Marathi" onchange="updateMultiSelect('languages')"><label for="lang_marathi">Marathi</label></div>
-                                    <div class="multi-select-option"><input type="checkbox" id="lang_tamil" value="Tamil" onchange="updateMultiSelect('languages')"><label for="lang_tamil">Tamil</label></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                <label for="status">Status:</label>
-                                <select id="status" name="status" required>
-                                    <option value="">Select Status</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                    <option value="Suspended">Suspended</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="onboardingDate">Onboarding Date:</label>
-                                <input type="date" id="onboardingDate" name="onboardingDate" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="type">Type:</label>
-                            <select id="type" name="type" required>
-                                <option value="">Select Type</option>
-                                <option value="Individual">Individual</option>
-                                <option value="Agency">Agency</option>
-                                <option value="Sub Agency">Sub Agency</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="submit-btn">Submit Form</button>
-                    </form>
-                </div>
-
-                <div id="registrationSummary">
-                    <div class="summary-header">
-                        <h2>✓ Registration Successful</h2>
-                        <p>Your registration has been completed successfully</p>
-                    </div>
-                    <div class="summary-section">
-                        <h3>👤 Personal Information</h3>
-                        <div class="summary-item"><span class="summary-label">Name:</span><span class="summary-value" id="sum-name"></span></div>
-                        <div class="summary-item"><span class="summary-label">Date of Birth:</span><span class="summary-value" id="sum-dob"></span></div>
-                        <div class="summary-item"><span class="summary-label">Gender:</span><span class="summary-value" id="sum-gender"></span></div>
-                    </div>
-                    <div class="summary-section">
-                        <h3>📍 Contact Details</h3>
-                        <div class="summary-item"><span class="summary-label">Address Line 1:</span><span class="summary-value" id="sum-address1"></span></div>
-                        <div class="summary-item"><span class="summary-label">Address Line 2:</span><span class="summary-value" id="sum-address2"></span></div>
-                        <div class="summary-item"><span class="summary-label">City:</span><span class="summary-value" id="sum-city"></span></div>
-                        <div class="summary-item"><span class="summary-label">State:</span><span class="summary-value" id="sum-state"></span></div>
-                        <div class="summary-item"><span class="summary-label">Postal Code:</span><span class="summary-value" id="sum-postalCode"></span></div>
-                    </div>
-                    <div class="summary-section">
-                        <h3>🌐 Multi-select Information</h3>
-                        <div class="summary-item"><span class="summary-label">Selected Cities:</span><div class="summary-tags" id="sum-cityMulti"></div></div>
-                        <div class="summary-item"><span class="summary-label">Languages:</span><div class="summary-tags" id="sum-languages"></div></div>
-                    </div>
-
-                    <button class="back-btn" onclick="goBackToForm()" style="width:100%;padding:10px;margin-top:8px;border:1px solid #667eea;background:#fff;color:#667eea;border-radius:6px">Back to Form</button>
-                    <button class="submit-btn" onclick="downloadJSON()" style="margin-top:8px">Download JSON Data</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Registration script stored as text; the injector will create a real script element and run it -->
-        <script id="registrationScript" type="text/plain">
-        // Store current registration data
-        let currentRegistrationData = null;
-
-        // City to Area mapping (minimal set used by injected UI)
-        const cityAreaMap = {
-            'Mumbai': ['Andheri','Bandra','Borivali','Colaba','Dadar','Juhu','Kurla','Malad','Powai','Thane'],
-            'Delhi': ['Connaught Place','Dwarka','Karol Bagh','Lajpat Nagar','Nehru Place','Rohini','Saket','Vasant Kunj'],
-            'Bangalore': ['Indiranagar','Jayanagar','Koramangala','Marathahalli','MG Road','Rajajinagar','RT Nagar','Whitefield','Yelahanka'],
-            'Hyderabad': ['Banjara Hills','Gachibowli','Hitech City','Jubilee Hills','Kukatpally','Madhapur','Secunderabad'],
-            'Chennai': ['Adyar','Anna Nagar','Guindy','Mylapore','Nungambakkam','T Nagar','Velachery'],
-            'Kolkata': ['Alipore','Ballygunge','Howrah','Park Street','Salt Lake','Tollygunge'],
-            'Pune': ['Aundh','Baner','Hinjewadi','Kothrud','Koregaon Park','Pimpri','Viman Nagar','Wakad'],
-            'Ahmedabad': ['Bopal','Maninagar','Naranpura','Satellite','SG Highway','Vastrapur']
-        };
-
-        const multiSelectData = { cityMulti: [], languages: [] };
-
-        function toggleDropdown(id) {
-            const dropdown = document.getElementById(id + 'Dropdown');
-            const arrow = document.getElementById(id + 'Arrow');
-            const display = dropdown ? dropdown.previousElementSibling : null;
-            if (!dropdown) return;
-            document.querySelectorAll('.multi-select-dropdown').forEach(dd => { if (dd.id !== id + 'Dropdown') dd.classList.remove('show'); });
-            document.querySelectorAll('.multi-select-arrow').forEach(arr => { if (arr.id !== id + 'Arrow') arr.classList.remove('open'); });
-            document.querySelectorAll('.multi-select-display').forEach(disp => { if (disp.nextElementSibling && disp.nextElementSibling.id !== id + 'Dropdown') disp.classList.remove('active'); });
-            dropdown.classList.toggle('show');
-            if (arrow) arrow.classList.toggle('open');
-            if (display) display.classList.toggle('active');
-        }
-
-        function updateMultiSelect(id) {
-            const dropdown = document.getElementById(id + 'Dropdown');
-            if (!dropdown) return;
-            const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
-            const values = Array.from(checkboxes).map(cb => cb.value);
-            multiSelectData[id] = values;
-            const displayElement = document.getElementById(id + 'Display');
-            if (!displayElement) return;
-            if (values.length === 0) {
-                displayElement.className = 'multi-select-placeholder';
-                let placeholderText = 'Select items';
-                if (id === 'cityMulti') placeholderText = 'Select cities';
-                else if (id === 'languages') placeholderText = 'Select languages';
-                displayElement.innerHTML = placeholderText;
-            } else {
-                displayElement.className = 'multi-select-selected';
-                displayElement.innerHTML = values.map(val => `<span class="selected-tag">${val}</span>`).join('');
-            }
-        }
-
-        function updateAreaDropdowns(city) {
-            const areaMultiDropdown = document.getElementById('areaMultiDropdown');
-            const areaMultiDisplay = document.getElementById('areaMultiDisplay');
-            if (!areaMultiDropdown) return;
-            if (!city || !cityAreaMap[city]) {
-                areaMultiDropdown.innerHTML = '<div class="multi-select-option" style="padding: 12px; text-align: center; color: #999;">Please select a city to see available areas</div>';
-                if (areaMultiDisplay) { areaMultiDisplay.className = 'multi-select-placeholder'; areaMultiDisplay.innerHTML = 'Select a city first'; }
-                return;
-            }
-            const areas = cityAreaMap[city];
-            areaMultiDropdown.innerHTML = '';
-            areas.forEach(area => {
-                const div = document.createElement('div'); div.className = 'multi-select-option';
-                const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = `area_${area.toLowerCase().replace(/\s+/g,'_')}`; cb.value = area; cb.onchange = () => updateMultiSelect('areaMulti');
-                const lbl = document.createElement('label'); lbl.htmlFor = cb.id; lbl.textContent = area;
-                div.appendChild(cb); div.appendChild(lbl); areaMultiDropdown.appendChild(div);
-            });
-            if (areaMultiDisplay) { areaMultiDisplay.className = 'multi-select-placeholder'; areaMultiDisplay.innerHTML = 'Select areas'; }
-        }
-
-        // Click outside to close dropdowns
-        document.addEventListener('click', function(e){ if (!e.target.closest('.multi-select-wrapper')) { document.querySelectorAll('.multi-select-dropdown').forEach(dd=>dd.classList.remove('show')); document.querySelectorAll('.multi-select-arrow').forEach(a=>a.classList.remove('open')); document.querySelectorAll('.multi-select-display').forEach(d=>d.classList.remove('active')); } });
-
-        // Form submission handler (attach after injection)
-        function attachFormHandler() {
-            const form = document.getElementById('mainForm');
-            if (!form) return;
-            form.addEventListener('submit', function(e){
-                e.preventDefault();
-                // simple multi-select validation
-                if ((multiSelectData.cityMulti && multiSelectData.cityMulti.length===0)) { alert('Please select at least one city'); return; }
-                // gather form data
-                const fd = new FormData(form); const data = {};
-                for (let [k,v] of fd.entries()) data[k]=v;
-                data.cityMulti = multiSelectData.cityMulti || [];
-                data.languages = multiSelectData.languages || [];
-                data.submittedAt = new Date().toISOString();
-                saveToJSON(data); displaySummary(data);
-            });
-        }
-
-        function saveToJSON(data){ currentRegistrationData = data; const jsonString = JSON.stringify(data,null,2); const blob = new Blob([jsonString],{type:'application/json'}); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href=url; link.download = `registration_${(data.name||'user').replace(/\s+/g,'_')}_${Date.now()}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); }
-
-        function downloadJSON(){ if(!currentRegistrationData){ alert('No registration data available'); return; } const jsonString = JSON.stringify(currentRegistrationData,null,2); const blob = new Blob([jsonString],{type:'application/json'}); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href=url; link.download = `registration_${(currentRegistrationData.name||'user').replace(/\s+/g,'_')}_${Date.now()}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); }
-
-        function displaySummary(data){ const formEl = document.getElementById('registrationForm'); const sumEl = document.getElementById('registrationSummary'); if (formEl) formEl.style.display='none'; if (sumEl) sumEl.classList.add('show'); const set = (id,val)=>{ const el = document.getElementById(id); if(el) el.textContent = val || 'N/A'; } set('sum-name',data.name); set('sum-dob',data.dob); set('sum-gender',data.gender); set('sum-address1',data.address1); set('sum-address2',data.address2||'N/A'); set('sum-city',data.city); set('sum-state',data.state); set('sum-postalCode',data.postalCode); set('sum-status',data.status); set('sum-onboardingDate',data.onboardingDate); set('sum-type',data.type);
-            const mapToTags=(arr,id)=>{ const holder = document.getElementById(id); if(!holder) return; holder.innerHTML = (arr||[]).map(v=>`<span class="summary-tag">${v}</span>`).join(''); };
-            mapToTags(data.cityMulti,'sum-cityMulti'); mapToTags(data.languages,'sum-languages'); window.scrollTo(0,0);
-        }
-
-        function goBackToForm(){ const formEl = document.getElementById('registrationForm'); const sumEl = document.getElementById('registrationSummary'); if(formEl) formEl.style.display='block'; if(sumEl) sumEl.classList.remove('show'); window.scrollTo(0,0); }
-
-        // Run small initializer after script is injected
-        (function(){
-            // wire city change to update area dropdown if area dropdown exists
-            const citySelect = document.getElementById('city'); if(citySelect){ citySelect.addEventListener('change', function(){ updateAreaDropdowns(this.value); }); }
-            // attach form handler
-            attachFormHandler();
-        })();
-
-        </script>
-    </template>
 </body>
 </html>
-
